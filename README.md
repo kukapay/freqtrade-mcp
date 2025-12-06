@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/kukapay-freqtrade-mcp-badge.png)](https://mseep.ai/app/kukapay-freqtrade-mcp)
+
 # Freqtrade-MCP
 
 An MCP server that integrates with the [Freqtrade](https://www.freqtrade.io/) cryptocurrency trading bot via its REST API, enabling seamless AI agent interaction for automated trading operation.
