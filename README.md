@@ -11,18 +11,102 @@ For more crypto-related MCP servers, see the [Kukapay MCP servers](https://githu
 ## Installation
 
 ### Prerequisites
-- **Python 3.13+**: Ensure Python is installed on your system.
-- **Freqtrade**: A running Freqtrade instance with the REST API enabled (see [Freqtrade Docs](https://www.freqtrade.io/en/stable/rest-api/)).
-- **Git**: For cloning the repository.
+- **Docker**: Install Docker and Docker Compose from [docker.com](https://www.docker.com/get-started)
+- **Freqtrade**: A running Freqtrade instance with the REST API enabled (see [Freqtrade Docs](https://www.freqtrade.io/en/stable/rest-api/))
+- **Git**: For cloning the repository
 
-### Steps
+### Method 1: Docker Installation (Recommended)
+
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/kukapay/freqtrade-mcp.git
    cd freqtrade-mcp
    ```
 
-2. **Install Dependencies**:
+2. **Create Environment File** (optional):
+   Create a `.env` file in the project root:
+   ```bash
+   FREQTRADE_API_URL=http://your-freqtrade-host:8080
+   FREQTRADE_USERNAME=your_username
+   FREQTRADE_PASSWORD=your_password
+   FREQTRADE_NETWORK=freqtrade  # Docker network name if Freqtrade is in Docker
+   ```
+
+3. **Build and Run with Docker Compose**:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Claude Desktop Configuration**:
+   Add to your Claude Desktop configuration:
+   ```json
+   "mcpServers": {
+     "freqtrade-mcp": {
+       "command": "docker",
+       "args": [
+         "run",
+         "--rm",
+         "-i",
+         "--network", "freqtrade",
+         "-e", "FREQTRADE_API_URL=http://freqtrade:8080",
+         "-e", "FREQTRADE_USERNAME=your_username",
+         "-e", "FREQTRADE_PASSWORD=your_password",
+         "freqtrade-mcp:latest"
+       ]
+     }
+   }
+   ```
+
+   **Alternative**: Using pre-built Docker image from GitHub Container Registry:
+   ```json
+   "mcpServers": {
+     "freqtrade-mcp": {
+       "command": "docker",
+       "args": [
+         "run",
+         "--rm",
+         "-i",
+         "--network", "freqtrade",
+         "-e", "FREQTRADE_API_URL=http://freqtrade:8080",
+         "-e", "FREQTRADE_USERNAME=your_username",
+         "-e", "FREQTRADE_PASSWORD=your_password",
+         "ghcr.io/kukapay/freqtrade-mcp:latest"
+       ]
+     }
+   }
+   ```
+
+   **Note**: If your Freqtrade instance is running on the host machine (not in Docker), use:
+   ```json
+   "mcpServers": {
+     "freqtrade-mcp": {
+       "command": "docker",
+       "args": [
+         "run",
+         "--rm",
+         "-i",
+         "--add-host", "host.docker.internal:host-gateway",
+         "-e", "FREQTRADE_API_URL=http://host.docker.internal:8080",
+         "-e", "FREQTRADE_USERNAME=your_username",
+         "-e", "FREQTRADE_PASSWORD=your_password",
+         "freqtrade-mcp"
+       ]
+     }
+   }
+   ```
+
+### Method 2: Manual Installation
+
+1. **Prerequisites**:
+   - Python 3.13+ installed on your system
+
+2. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/kukapay/freqtrade-mcp.git
+   cd freqtrade-mcp
+   ```
+
+3. **Install Dependencies**:
    Using `pip`:
    ```bash
    pip install freqtrade-client mcp[cli]
@@ -32,47 +116,53 @@ For more crypto-related MCP servers, see the [Kukapay MCP servers](https://githu
    uv add freqtrade-client "mcp[cli]"
    ```
 
-3. **Client Configuration**:
+4. **Claude Desktop Configuration**:
+   ```json
+   "mcpServers": { 
+     "freqtrade-mcp": { 
+       "command": "uv", 
+       "args": [ 
+         "--directory", "/your/path/to/freqtrade-mcp", 
+         "run", 
+         "__main__.py" 
+       ], 
+       "env": { 
+          "FREQTRADE_API_URL": "http://127.0.0.1:8080",
+          "FREQTRADE_USERNAME": "your_username",
+          "FREQTRADE_PASSWORD": "your_password"
+       } 
+     } 
+   }
+   ```
+### Freqtrade Configuration
 
-    ```
-    "mcpServers": { 
-      "freqtrade-mcp": { 
-        "command": "uv", 
-        "args": [ 
-          "--directory", "/your/path/to/freqtrade-mcp", 
-          "run", 
-          "__main__.py" 
-        ], 
-        "env": { 
-           "FREQTRADE_API_URL": "http://127.0.0.1:8080",
-           "FREQTRADE_USERNAME": "your_username",
-           "FREQTRADE_PASSWORD": "your_password"
-        } 
-      } 
-    }
-    ```
-    
-4. **Freqtrade Configuration**:
+Enable the rest API by adding the api_server section to your configuration and setting api_server.enabled to true.
 
-    Enable the rest API by adding the api_server section to your configuration and setting api_server.enabled to true.
+Sample configuration:
+```json
+"api_server": {
+    "enabled": true,
+    "listen_ip_address": "127.0.0.1",
+    "listen_port": 8080,
+    "verbosity": "error",
+    "enable_openapi": false,
+    "jwt_secret_key": "somethingrandom",
+    "CORS_origins": [],
+    "username": "Freqtrader",
+    "password": "SuperSecret1!",
+    "ws_token": "sercet_Ws_t0ken"
+}
+```
 
-    Sample configuration:
-    ```
-        "api_server": {
-        "enabled": true,
-        "listen_ip_address": "127.0.0.1",
-        "listen_port": 8080,
-        "verbosity": "error",
-        "enable_openapi": false,
-        "jwt_secret_key": "somethingrandom",
-        "CORS_origins": [],
-        "username": "Freqtrader",
-        "password": "SuperSecret1!",
-        "ws_token": "sercet_Ws_t0ken"
-    },
-    ```
+Check the document [here](https://www.freqtrade.io/en/stable/rest-api/#configuration).
 
-   Check the document [here](https://www.freqtrade.io/en/stable/rest-api/#configuration).
+## Docker Images
+
+Pre-built Docker images are available from:
+- **GitHub Container Registry**: `ghcr.io/kukapay/freqtrade-mcp:latest`
+- **Docker Hub**: `kukapay/freqtrade-mcp:latest` (requires setting up Docker Hub secrets)
+
+Images are automatically built for multiple platforms (linux/amd64, linux/arm64) on each push to main branch.
 
 ## Usage
 
