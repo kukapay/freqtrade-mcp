@@ -8,6 +8,8 @@ For more crypto-related MCP servers, see the [Kukapay MCP servers](https://githu
 ![Python Version](https://img.shields.io/badge/python-3.13+-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen.svg)
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/kukapay/freqtrade-mcp)](https://archestra.ai/mcp-catalog/kukapay__freqtrade-mcp)
+
 ## Installation
 
 ### Prerequisites
