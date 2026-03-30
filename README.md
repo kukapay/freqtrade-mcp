@@ -74,6 +74,10 @@ For more crypto-related MCP servers, see the [Kukapay MCP servers](https://githu
 
    Check the document [here](https://www.freqtrade.io/en/stable/rest-api/#configuration).
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/kukapay-freqtrade-mcp).
+
 ## Usage
 
 ### Available Tools
